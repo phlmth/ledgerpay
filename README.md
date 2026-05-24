@@ -3,8 +3,14 @@
 > Backend Java sandbox para carteiras digitais e transferências.
 
 
+
+
 ## Status atual
 projeto está na fase de fundação e modelagem inicial do domínio.
+
+
+## Documentação
+- [Definição inicial do projeto](docs/00-project-definition.md)
 
 ## Stack atual
 - Java 21
