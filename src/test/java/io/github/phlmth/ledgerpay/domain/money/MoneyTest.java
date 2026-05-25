@@ -23,4 +23,13 @@ class MoneyTest {
 
         assertThat(money.amount()).isEqualTo(expectedAmount);
     }
+
+    @Test
+    void shouldNormalizeAmountCreatedThroughCanonicalConstructor() {
+        var expectedAmount = new BigDecimal("10.00");
+
+        Money money = new Money(new BigDecimal("10"));
+
+        assertThat(money.amount()).isEqualTo(expectedAmount);
+    }
 }
