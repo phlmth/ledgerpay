@@ -26,4 +26,8 @@ public record Money(BigDecimal amount) {
   public Money subtract(Money other) {
     return new Money(this.amount().subtract(other.amount()));
   }
+
+  public boolean isPositive() {
+    return (amount().compareTo(BigDecimal.ZERO) > 0);
+  }
 }
