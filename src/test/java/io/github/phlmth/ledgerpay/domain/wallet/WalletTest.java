@@ -16,6 +16,17 @@ class WalletTest {
   }
 
   @Test
+  void shouldRejectNullInitialBalance() {
+    assertThatThrownBy(() -> new Wallet(null)).isInstanceOf(NullPointerException.class);
+  }
+
+  @Test
+  void shouldRejectNegativeInitialBalance() {
+    assertThatThrownBy(() -> new Wallet(Money.of("-10.00")))
+        .isInstanceOf(IllegalArgumentException.class);
+  }
+
+  @Test
   void shouldRejectDebitWhenBalanceIsInsufficient() {
     Wallet wallet = new Wallet(Money.of("100.00"));
 
