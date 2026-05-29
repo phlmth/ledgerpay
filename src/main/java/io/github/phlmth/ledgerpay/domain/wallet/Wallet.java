@@ -9,6 +9,10 @@ public class Wallet {
     this.balance = balance;
   }
 
+  public Wallet() {
+    this(Money.of("0.00"));
+  }
+
   public Money balance() {
     return this.balance;
   }
