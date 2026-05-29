@@ -6,7 +6,7 @@ import io.github.phlmth.ledgerpay.domain.wallet.Wallet;
 public class TreasuryFunding {
   public void execute(Wallet treasury, Wallet destination, Money amount) {
 
-    if (amount.equals(Money.of("0.00"))) {
+    if (!amount.isPositive()) {
       throw new IllegalArgumentException();
     }
 
