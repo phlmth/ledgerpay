@@ -57,4 +57,12 @@ class WalletTest {
 
     assertThat(wallet.balance()).isEqualTo(Money.of("100.00"));
   }
+
+  @Test
+  void shouldAllowDebitEqualToBalance() {
+    Wallet wallet = new Wallet(Money.of("100.00"));
+    wallet.debit(Money.of("100.00"));
+
+    assertThat(wallet.balance()).isEqualTo(Money.of("0.00"));
+  }
 }
