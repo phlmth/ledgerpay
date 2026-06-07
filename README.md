@@ -1,18 +1,36 @@
 # LedgerPay
 
-> Java backend sandbox for digital wallets, money movement, and financial domain modeling.
+> Java backend sandbox for modeling digital wallets, money movement, and financial domain rules.
 
-## Current Status
+LedgerPay is a small backend project focused on monetary correctness, explicit domain modeling, and automated validation for financial operations.
 
-LedgerPay has completed its technical foundation and now includes its first in-memory financial flow: funding a wallet from an explicit `SystemTreasury`.
+The project currently models wallet funding and peer-to-peer transfers entirely in memory. It is intentionally framework-free while the core financial domain is being shaped and tested.
 
-The project currently focuses on domain modeling, monetary correctness, unit testing, and incremental architecture. It does not yet include persistence, REST APIs, authentication, idempotency, or a formal ledger.
+## Current Scope
+
+LedgerPay currently supports:
+
+- monetary values through a `Money` Value Object;
+- stable wallet identities through `WalletId`;
+- wallets with protected balance invariants;
+- an explicit `SystemTreasury` funding source;
+- wallet funding through `TreasuryFunding`;
+- peer-to-peer wallet transfers through `PeerTransfer`;
+- domain-specific exceptions for business rule violations;
+- automated tests for implemented behavior.
+
+The current financial flows are:
+
+```text
+SystemTreasury → TreasuryFunding → Wallet
+Wallet         → PeerTransfer    → Wallet
+```
 
 ## Documentation
 
-- [Initial project definition](docs/00-project-definition.md)
+- [Project definition](docs/00-project-definition.md)
 
-## Current Stack
+## Tech Stack
 
 - Java 21
 - Maven
@@ -20,63 +38,98 @@ The project currently focuses on domain modeling, monetary correctness, unit tes
 - JUnit 5
 - AssertJ
 - Spotless
-* `google-java-format`
-
-## Development with GitHub Codespaces
-
-The repository includes a dev container configuration with Java 21 to provide a reproducible development environment in GitHub Codespaces.
+- `google-java-format`
+- GitHub Codespaces dev container
+- Optional Makefile shortcuts
 
 ## Running Tests
 
-### Linux/macOS
+Linux/macOS:
 
 ```bash
 ./mvnw test
 ```
 
-### Windows
+Windows:
 
 ```powershell
 .\mvnw.cmd test
 ```
 
-## Development Shortcuts
+## Local Validation
 
-The commands below are optional shortcuts for environments with `make` available. The Maven Wrapper remains the canonical way to run the project build and tests.
+The Maven Wrapper is the canonical way to run the project.
 
-| Command             | Description                                  |
-| ------------------- | -------------------------------------------- |
-| `make help`         | Lists available shortcuts.                   |
-| `make test`         | Runs the test suite.                         |
-| `make verify`       | Runs full validation before review or merge. |
-| `make clean`        | Removes Maven build artifacts.               |
-| `make format`       | Applies Java formatting.                     |
-| `make format-check` | Checks Java formatting.                      |
+For environments with `make` available, the repository also provides shortcuts:
 
-## Automated Quality
+| Command | Description |
+| --- | --- |
+| `make help` | Lists available shortcuts. |
+| `make test` | Runs the test suite. |
+| `make verify` | Runs tests and formatting checks. |
+| `make clean` | Removes Maven build artifacts. |
+| `make format` | Applies Java formatting. |
+| `make format-check` | Checks Java formatting. |
 
-The project uses Spotless with `google-java-format` to keep Java formatting consistent. Formatting checks are executed during `make verify`.
+Before review or merge, run:
 
-## Implemented Domain
+```bash
+make verify
+```
 
-- [x] `Money` Value Object
-- [x] `Wallet` with protected in-memory balance operations
-- [x] `SystemTreasury` with fixed initial funds
-- [x] Treasury funding flow in memory
-- [ ] Peer transfer between wallets
-- [ ] Persistence with Spring Boot and PostgreSQL
-- [ ] REST API sandbox
-- [ ] Future evolution toward a formal ledger
+## Domain Rules
 
-## Current Limitations
+LedgerPay currently enforces the following rules:
 
-At the current stage, LedgerPay does not include:
+- monetary values use two decimal places;
+- real fractions of cents are rejected;
+- wallets start with zero balance by default;
+- wallets cannot be created with negative balance;
+- credits and debits require positive amounts;
+- debits cannot exceed available balance;
+- treasury funding requires a positive amount;
+- treasury funding cannot exceed treasury funds;
+- peer transfers require different wallet identities;
+- peer transfers cannot exceed the source wallet balance;
+- failed operations preserve existing balances.
 
-- REST API
-- persistence
-- authentication or authorization
-- idempotency
-- transaction boundaries
-- formal ledger or double-entry accounting
+## Exception Model
 
-The current model uses direct in-memory balances to support incremental domain learning before evolving toward more robust financial architecture.
+Business rule violations use domain-specific unchecked exceptions:
+
+- `InvalidWalletBalanceException`
+- `InvalidMoneyMovementAmountException`
+- `InsufficientBalanceException`
+- `SameWalletTransferException`
+
+Structural contract failures, such as `null` arguments or invalid Value Object input, still use standard Java exceptions.
+
+## Not Yet Included
+
+LedgerPay does not yet include:
+
+- REST API;
+- Spring Boot application layer;
+- persistence;
+- repositories;
+- authentication or authorization;
+- idempotency;
+- transaction boundaries;
+- formal ledger;
+- double-entry accounting;
+- HTTP error mapping.
+
+These omissions are intentional. The project is first establishing a small, well-tested financial domain before adding infrastructure concerns.
+
+## Roadmap Candidates
+
+Future stages may include:
+
+- application service boundaries;
+- persistence with PostgreSQL;
+- REST API exposure;
+- idempotent money movement operations;
+- ledger entries;
+- balance derivation from ledger history;
+- double-entry accounting;
+- structured API error responses.
