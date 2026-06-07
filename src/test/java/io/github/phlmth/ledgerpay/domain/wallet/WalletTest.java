@@ -3,6 +3,9 @@ package io.github.phlmth.ledgerpay.domain.wallet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import io.github.phlmth.ledgerpay.domain.exception.InsufficientBalanceException;
+import io.github.phlmth.ledgerpay.domain.exception.InvalidMoneyMovementAmountException;
+import io.github.phlmth.ledgerpay.domain.exception.InvalidWalletBalanceException;
 import io.github.phlmth.ledgerpay.domain.money.Money;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +26,7 @@ class WalletTest {
   @Test
   void shouldRejectNegativeInitialBalance() {
     assertThatThrownBy(() -> new Wallet(Money.of("-10.00")))
-        .isInstanceOf(IllegalArgumentException.class);
+        .isInstanceOf(InvalidWalletBalanceException.class);
   }
 
   @Test
@@ -31,7 +34,7 @@ class WalletTest {
     Wallet wallet = new Wallet(Money.of("100.00"));
 
     assertThatThrownBy(() -> wallet.debit(Money.of("150.00")))
-        .isInstanceOf(IllegalStateException.class);
+        .isInstanceOf(InsufficientBalanceException.class);
 
     assertThat(wallet.balance()).isEqualTo(Money.of("100.00"));
   }
@@ -41,7 +44,7 @@ class WalletTest {
     Wallet wallet = new Wallet(Money.of("100.00"));
 
     assertThatThrownBy(() -> wallet.debit(Money.of("0.00")))
-        .isInstanceOf(IllegalArgumentException.class);
+        .isInstanceOf(InvalidMoneyMovementAmountException.class);
 
     assertThat(wallet.balance()).isEqualTo(Money.of("100.00"));
   }
@@ -51,7 +54,7 @@ class WalletTest {
     Wallet wallet = new Wallet(Money.of("100.00"));
 
     assertThatThrownBy(() -> wallet.debit(Money.of("-10.00")))
-        .isInstanceOf(IllegalArgumentException.class);
+        .isInstanceOf(InvalidMoneyMovementAmountException.class);
 
     assertThat(wallet.balance()).isEqualTo(Money.of("100.00"));
   }
@@ -61,7 +64,7 @@ class WalletTest {
     Wallet wallet = new Wallet(Money.of("100.00"));
 
     assertThatThrownBy(() -> wallet.credit(Money.of("0.00")))
-        .isInstanceOf(IllegalArgumentException.class);
+        .isInstanceOf(InvalidMoneyMovementAmountException.class);
 
     assertThat(wallet.balance()).isEqualTo(Money.of("100.00"));
   }
@@ -71,7 +74,7 @@ class WalletTest {
     Wallet wallet = new Wallet(Money.of("100.00"));
 
     assertThatThrownBy(() -> wallet.credit(Money.of("-10.00")))
-        .isInstanceOf(IllegalArgumentException.class);
+        .isInstanceOf(InvalidMoneyMovementAmountException.class);
 
     assertThat(wallet.balance()).isEqualTo(Money.of("100.00"));
   }
@@ -130,8 +133,7 @@ class WalletTest {
   @Test
   void shouldRejectNegativeBalanceWhenUsingExplicitConstructor() {
     Money balance = Money.of("-10.00");
-
     assertThatThrownBy(() -> new Wallet(WalletId.newId(), balance))
-        .isInstanceOf(IllegalArgumentException.class);
+        .isInstanceOf(InvalidWalletBalanceException.class);
   }
 }

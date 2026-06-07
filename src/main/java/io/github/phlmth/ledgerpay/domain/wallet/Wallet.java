@@ -1,5 +1,8 @@
 package io.github.phlmth.ledgerpay.domain.wallet;
 
+import io.github.phlmth.ledgerpay.domain.exception.InsufficientBalanceException;
+import io.github.phlmth.ledgerpay.domain.exception.InvalidMoneyMovementAmountException;
+import io.github.phlmth.ledgerpay.domain.exception.InvalidWalletBalanceException;
 import io.github.phlmth.ledgerpay.domain.money.Money;
 import java.util.Objects;
 
@@ -20,7 +23,7 @@ public class Wallet {
     Objects.requireNonNull(balance);
 
     if (balance.isLessThan(Money.of("0.00"))) {
-      throw new IllegalArgumentException();
+      throw new InvalidWalletBalanceException("cannot be created with a negative balance");
     }
 
     this.id = walletId;
@@ -37,7 +40,7 @@ public class Wallet {
 
   public void credit(Money amount) {
     if (!amount.isPositive()) {
-      throw new IllegalArgumentException();
+      throw new InvalidMoneyMovementAmountException("invalid money movement amount");
     }
 
     balance = balance.add(amount);
@@ -45,11 +48,11 @@ public class Wallet {
 
   public void debit(Money amount) {
     if (!amount.isPositive()) {
-      throw new IllegalArgumentException();
+      throw new InvalidMoneyMovementAmountException("invalid money movement amount");
     }
 
     if (balance.isLessThan(amount)) {
-      throw new IllegalStateException();
+      throw new InsufficientBalanceException("insufficient balance");
     }
 
     balance = balance.subtract(amount);
